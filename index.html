@@ -1173,7 +1173,14 @@ const MEMORY = {
 
     // City: "я из X", "живу в X"
     const cityMatch = lower.match(/(?:я из|живу в|из города)\s+([а-яёa-z]{2,20})/i);
-    if (cityMatch) facts.push({ type: 'city', value: cityMatch[1].trim() });
+    if (cityMatch) {
+      let city = cityMatch[1].trim();
+      // Capitalize first letter
+      city = city[0].toUpperCase() + city.slice(1);
+      // Simple nominative conversion (Москвы → Москва, Петербурга → Петербург)
+      city = city.replace(/ы$/, 'а').replace(/урга$/, 'urg' === 'urg' ? 'ург' : 'урга');
+      facts.push({ type: 'city', value: city });
+    }
 
     // Work: "работаю X", "я X по профессии"
     const workMatch = lower.match(/(?:работаю|я работаю|по профессии)\s+([а-яёa-z\s]{2,30})/i);
@@ -1950,6 +1957,7 @@ renderActiveChars();
 renderFAQ();
 updateBond(state.selected);
 updateStats();
+updateProfile();
 </script>
 
 </body>
