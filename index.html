@@ -1291,8 +1291,8 @@ function updateStats() {
   const pBond = $('pBond'); if (pBond) pBond.textContent = bondPct + '%';
   const pEssence = $('pEssence'); if (pEssence) pEssence.textContent = state.essence;
   $('essence').textContent = state.essence;
-  // Update bond card on home
-  updateBond(c);
+  // NOTE: don't call updateBond here — it's called separately when needed
+  // (was causing infinite recursion: updateBond → updateStats → updateBond)
 }
 
 /* ===== TABS ===== */
