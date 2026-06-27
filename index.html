@@ -12,8 +12,8 @@
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin:0; padding:0; }
   :root{
+    /* === THEME: aurora (default - romantic pink/violet) === */
     --bg:#0a0a14;
-    --bg-2:#13131f;
     --surface:rgba(255,255,255,0.04);
     --surface-2:rgba(255,255,255,0.08);
     --stroke:rgba(255,255,255,0.08);
@@ -21,18 +21,17 @@
     --text:#fff;
     --muted:#9ca3af;
     --muted-2:#6b7280;
-    --aurora-1:#f472b6;  /* pink */
-    --aurora-2:#a855f7;  /* violet */
-    --aurora-3:#22d3ee;  /* cyan */
-    --luna-1:#67e8f9;
-    --luna-2:#3b82f6;
-    --luna-3:#6366f1;
-    --nexus-1:#fb923c;
-    --nexus-2:#ef4444;
-    --nexus-3:#f59e0b;
-    --zephyr-1:#a3e635;
-    --zephyr-2:#10b981;
-    --zephyr-3:#22d3ee;
+    --accent-1:#f472b6;
+    --accent-2:#a855f7;
+    --accent-3:#22d3ee;
+    --grad-main: linear-gradient(135deg,#f472b6 0%,#a855f7 100%);
+    --bg-glow-1: rgba(244,114,182,0.10);
+    --bg-glow-2: rgba(168,85,247,0.10);
+    --bg-glow-3: rgba(34,211,238,0.06);
+    /* legacy aliases */
+    --aurora-1:#f472b6;
+    --aurora-2:#a855f7;
+    --aurora-3:#22d3ee;
     --amber:#f5a623;
     --lime:#a3e635;
     --r-lg: 22px;
@@ -41,16 +40,67 @@
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* === THEME: midnight (deep blue/indigo) === */
+  [data-theme="midnight"]{
+    --bg:#0a0f1e;
+    --accent-1:#60a5fa;
+    --accent-2:#6366f1;
+    --accent-3:#818cf8;
+    --grad-main: linear-gradient(135deg,#60a5fa 0%,#6366f1 100%);
+    --bg-glow-1: rgba(96,165,250,0.10);
+    --bg-glow-2: rgba(99,102,241,0.10);
+    --bg-glow-3: rgba(129,140,248,0.06);
+  }
+
+  /* === THEME: forest (emerald/teal) === */
+  [data-theme="forest"]{
+    --bg:#0a1410;
+    --accent-1:#34d399;
+    --accent-2:#14b8a6;
+    --accent-3:#5eead4;
+    --grad-main: linear-gradient(135deg,#34d399 0%,#14b8a6 100%);
+    --bg-glow-1: rgba(52,211,153,0.10);
+    --bg-glow-2: rgba(20,184,166,0.10);
+    --bg-glow-3: rgba(94,234,212,0.06);
+  }
+
+  /* === THEME: sunset (peach/coral) === */
+  [data-theme="sunset"]{
+    --bg:#1a0e0a;
+    --accent-1:#fb923c;
+    --accent-2:#f87171;
+    --accent-3:#fbbf24;
+    --grad-main: linear-gradient(135deg,#fb923c 0%,#f87171 100%);
+    --bg-glow-1: rgba(251,146,60,0.10);
+    --bg-glow-2: rgba(248,113,113,0.10);
+    --bg-glow-3: rgba(251,191,36,0.06);
+  }
+
+  /* === THEME: mono (graphite/silver) === */
+  [data-theme="mono"]{
+    --bg:#0d0d0f;
+    --accent-1:#e5e7eb;
+    --accent-2:#9ca3af;
+    --accent-3:#d1d5db;
+    --grad-main: linear-gradient(135deg,#e5e7eb 0%,#9ca3af 100%);
+    --bg-glow-1: rgba(229,231,235,0.06);
+    --bg-glow-2: rgba(156,163,175,0.06);
+    --bg-glow-3: rgba(209,213,219,0.04);
+  }
+
   html,body{
-    height:100%; background:#0a0a14; color:var(--text);
+    height:100%; background:var(--bg); color:var(--text);
     font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing:antialiased; overflow:hidden;
+    transition: background .4s ease;
   }
   body{
     display:flex; align-items:center; justify-content:center;
     background:
-      radial-gradient(1000px 700px at 50% -10%, rgba(244,114,182,0.10), transparent 60%),
-      radial-gradient(800px 500px at 100% 100%, rgba(168,85,247,0.10), transparent 60%),
+      radial-gradient(1000px 700px at 50% -10%, var(--bg-glow-1), transparent 60%),
+      radial-gradient(800px 500px at 100% 100%, var(--bg-glow-2), transparent 60%),
+      radial-gradient(700px 500px at 0% 50%, var(--bg-glow-3), transparent 60%),
       #000;
   }
 
@@ -68,9 +118,9 @@
   /* Ambient background */
   .ambient{ position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
   .blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.30; animation: float 18s ease-in-out infinite; }
-  .blob.a{ width:340px; height:340px; background:#f472b6; top:-80px; left:-80px; }
-  .blob.b{ width:300px; height:300px; background:#a855f7; bottom:-60px; right:-80px; animation-delay:-6s; opacity:.25; }
-  .blob.c{ width:240px; height:240px; background:#22d3ee; top:40%; right:-100px; opacity:.18; animation-delay:-3s; }
+  .blob.a{ width:340px; height:340px; background:var(--accent-1); top:-80px; left:-80px; }
+  .blob.b{ width:300px; height:300px; background:var(--accent-2); bottom:-60px; right:-80px; animation-delay:-6s; opacity:.25; }
+  .blob.c{ width:240px; height:240px; background:var(--accent-3); top:40%; right:-100px; opacity:.18; animation-delay:-3s; }
   @keyframes float{
     0%,100%{ transform: translate(0,0) scale(1); }
     50%{ transform: translate(20px,-30px) scale(1.08); }
@@ -135,7 +185,7 @@
   /* Section header */
   .sec-head{ display:flex; align-items:center; justify-content:space-between; margin: 4px 0 12px; }
   .sec-title{ font-size:15px; font-weight:700; letter-spacing:-0.01em; }
-  .sec-link{ font-size:12px; color:var(--aurora-1); font-weight:600; cursor:pointer; background:none; border:none; font-family:inherit; }
+  .sec-link{ font-size:12px; color:var(--accent-1); font-weight:600; cursor:pointer; background:none; border:none; font-family:inherit; }
 
   /* Character cards */
   .char-list{ display:flex; flex-direction:column; gap:11px; }
@@ -187,7 +237,7 @@
     background:var(--surface); border:1px solid var(--stroke);
     border-radius:var(--r-md); padding:11px 8px; text-align:center;
   }
-  .stat b{ display:block; font-family:'Unbounded', sans-serif; font-weight:800; font-size:18px; color: var(--aurora-1); line-height:1.1; }
+  .stat b{ display:block; font-family:'Unbounded', sans-serif; font-weight:800; font-size:18px; color: var(--accent-1); line-height:1.1; }
   .stat small{ font-size:10px; color:var(--muted); display:block; margin-top:3px; }
 
   /* Bond meter */
@@ -199,16 +249,16 @@
   .bond-title{ font-size:13px; font-weight:700; }
   .bond-level{
     font-family:'Unbounded', sans-serif; font-weight:800; font-size:14px;
-    color: var(--char-color, var(--aurora-1));
+    color: var(--char-color, var(--accent-1));
   }
   .bond-bar{
     height:8px; background: rgba(255,255,255,0.08);
     border-radius:4px; overflow:hidden;
   }
   .bond-fill{
-    height:100%; background: var(--char-grad, linear-gradient(90deg,#f472b6,#a855f7));
+    height:100%; background: var(--char-grad, var(--grad-main));
     border-radius:4px; transition: width .6s cubic-bezier(.4,0,.2,1);
-    box-shadow: 0 0 12px var(--char-color, #f472b6);
+    box-shadow: 0 0 12px var(--char-color, var(--accent-1));
   }
   .bond-meta{ display:flex; justify-content:space-between; margin-top:6px; font-size:10px; color:var(--muted); }
 
@@ -259,7 +309,7 @@
   }
   .msg.me{
     align-self:flex-end;
-    background: var(--char-grad, linear-gradient(135deg,#f472b6,#a855f7));
+    background: var(--char-grad, var(--grad-main));
     color:#fff;
     border-bottom-right-radius: 4px;
   }
@@ -296,10 +346,10 @@
     color:#fff; font-family:inherit; font-size:14px; line-height:1.4;
     outline:none;
   }
-  .chat-input textarea:focus{ border-color: var(--char-color, var(--aurora-1)); }
+  .chat-input textarea:focus{ border-color: var(--char-color, var(--accent-1)); }
   .send-btn{
     width:40px; height:40px; border-radius:50%; border:none;
-    background: var(--char-grad, linear-gradient(135deg,#f472b6,#a855f7));
+    background: var(--char-grad, var(--grad-main));
     color:#fff; cursor:pointer;
     display:grid; place-items:center; flex-shrink:0;
     box-shadow: 0 4px 12px var(--char-shadow, rgba(244,114,182,0.4));
@@ -380,7 +430,7 @@
   .nav-item svg{ width:21px; height:21px; }
   .nav-item.active{ color:#fff; }
   .nav-item.active .nav-ico{
-    background: linear-gradient(135deg, #f472b6, #a855f7);
+    background: var(--grad-main);
     color:#fff;
   }
   .nav-ico{
@@ -427,7 +477,7 @@
   .modal-icon{
     width:64px; height:64px; border-radius:50%;
     margin:0 auto 14px;
-    background: linear-gradient(135deg, #f472b6, #a855f7);
+    background: var(--grad-main);
     display:grid; place-items:center;
     box-shadow: 0 8px 24px rgba(244,114,182,0.4);
     animation: pulse-scale 2s infinite;
@@ -444,7 +494,7 @@
   .modal-reward b{ font-family:'Unbounded', sans-serif; font-weight:800; font-size:20px; color:var(--amber); }
   .modal-btn{
     width:100%; padding:12px; border:none; border-radius:12px;
-    background: linear-gradient(135deg, #f472b6, #a855f7);
+    background: var(--grad-main);
     color:#fff; font-family:inherit; font-weight:800; font-size:14px;
     cursor:pointer;
     box-shadow: 0 6px 16px rgba(244,114,182,0.4);
@@ -464,17 +514,131 @@
   }
   .credit-name{
     font-family:'Unbounded', sans-serif; font-weight:800; font-size:14px;
-    color: var(--aurora-1); letter-spacing:0.02em;
+    color: var(--accent-1); letter-spacing:0.02em;
     display:inline-flex; align-items:center; gap:6px;
   }
   .credit-name::before{
     content:''; display:inline-block;
     width:6px; height:6px; border-radius:50%;
-    background: var(--aurora-1);
-    box-shadow:0 0 8px var(--aurora-1);
+    background: var(--accent-1);
+    box-shadow:0 0 8px var(--accent-1);
     animation: pulse 2s infinite;
   }
   .credit-handle{ font-size:11px; color:var(--muted); margin-top:4px; }
+
+  /* === Theme picker === */
+  .theme-grid{
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;
+    margin-bottom:14px;
+  }
+  .theme-btn{
+    aspect-ratio:1; border-radius:12px;
+    border:2px solid var(--stroke); cursor:pointer;
+    position:relative; transition:.2s; overflow:hidden;
+  }
+  .theme-btn.active{
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 2px var(--accent-1);
+    transform: scale(1.05);
+  }
+  .theme-btn::before{
+    content:''; position:absolute; inset:0;
+    background: var(--theme-preview);
+  }
+  .theme-btn .check{
+    position:absolute; top:4px; right:4px;
+    width:18px; height:18px; border-radius:50%;
+    background: var(--accent-1);
+    color:#0a0a14; display:grid; place-items:center;
+    font-size:10px; font-weight:800;
+    opacity:0; transition:.2s;
+  }
+  .theme-btn.active .check{ opacity:1; }
+
+  /* === Avatar picker === */
+  .avatar-grid{
+    display:grid; grid-template-columns:repeat(6, 1fr); gap:8px;
+    margin-bottom:14px;
+  }
+  .avatar-btn{
+    aspect-ratio:1; border-radius:12px;
+    border:2px solid var(--stroke); cursor:pointer;
+    display:grid; place-items:center;
+    font-size:22px; transition:.2s;
+    background: var(--surface);
+  }
+  .avatar-btn.active{
+    border-color: var(--accent-1);
+    background: var(--surface-2);
+    transform: scale(1.08);
+  }
+
+  /* === Achievements === */
+  .ach-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;
+    margin-bottom:14px;
+  }
+  .ach-card{
+    background:var(--surface); border:1px solid var(--stroke);
+    border-radius:var(--r-md); padding:10px 6px; text-align:center;
+    position:relative; transition:.2s;
+  }
+  .ach-card.unlocked{
+    border-color: var(--accent-1);
+    background: linear-gradient(135deg, var(--bg-glow-1), transparent);
+  }
+  .ach-card.locked{ opacity:.4; filter:grayscale(1); }
+  .ach-icon{
+    font-size:24px; margin-bottom:4px;
+    display:block;
+  }
+  .ach-name{
+    font-size:9px; font-weight:700;
+    line-height:1.2;
+  }
+  .ach-desc{
+    font-size:8px; color:var(--muted);
+    margin-top:2px; line-height:1.2;
+  }
+
+  /* === FAQ === */
+  .faq-item{
+    background:var(--surface); border:1px solid var(--stroke);
+    border-radius:var(--r-md); margin-bottom:8px; overflow:hidden;
+  }
+  .faq-q{
+    padding:14px; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:13px; font-weight:600;
+    transition:.2s;
+  }
+  .faq-q:hover{ background: var(--surface-2); }
+  .faq-q .chev{
+    width:18px; height:18px; flex-shrink:0;
+    transition: transform .25s;
+    color: var(--muted);
+  }
+  .faq-item.open .faq-q .chev{ transform: rotate(180deg); color: var(--accent-1); }
+  .faq-a{
+    max-height:0; overflow:hidden;
+    transition: max-height .3s ease, padding .3s ease;
+    padding:0 14px;
+    font-size:12px; color:var(--muted); line-height:1.5;
+  }
+  .faq-item.open .faq-a{
+    max-height:300px; padding:0 14px 14px;
+  }
+
+  /* === Streamer typing cursor === */
+  .msg .cursor{
+    display:inline-block;
+    width:2px; height:14px;
+    background: var(--accent-1);
+    margin-left:2px;
+    vertical-align: text-bottom;
+    animation: blink 0.8s infinite;
+  }
+  @keyframes blink{ 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
 </style>
 </head>
 <body>
@@ -488,7 +652,7 @@
 
   <div class="topbar">
     <div class="brand">
-      <div class="logo" id="logoBox" style="background:linear-gradient(135deg,#f472b6,#a855f7);">
+      <div class="logo" id="logoBox" style="background:var(--grad-main);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 21s-7-4.5-9.5-9C.5 8 3 4 7 4c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 6.5 4 4.5 8C19 16.5 12 21 12 21Z"/>
         </svg>
@@ -521,6 +685,10 @@
     <div class="tab" data-tab="profile">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
       Профиль
+    </div>
+    <div class="tab" data-tab="more">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+      Ещё
     </div>
   </div>
 
@@ -607,41 +775,55 @@
     <div class="view" data-view="profile">
       <div class="sec-head">
         <div class="sec-title">Профиль</div>
+        <button class="sec-link" data-jump="more">FAQ →</button>
       </div>
 
-      <div style="text-align:center; padding:20px 16px 16px;">
-        <div id="profileAvatar" style="width:84px; height:84px; border-radius:50%; margin:0 auto 12px; background:linear-gradient(135deg,#f472b6,#a855f7); display:grid; place-items:center; box-shadow:0 8px 24px rgba(244,114,182,0.35), inset 0 0 0 3px rgba(255,255,255,0.18);">
-          <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
-          </svg>
+      <div style="text-align:center; padding:16px 16px 12px;">
+        <div id="profileAvatar" style="width:84px; height:84px; border-radius:50%; margin:0 auto 12px; background:var(--grad-main); display:grid; place-items:center; font-size:42px; box-shadow:0 8px 24px rgba(244,114,182,0.35), inset 0 0 0 3px rgba(255,255,255,0.18);">
+          🌸
         </div>
         <div style="font-family:'Unbounded', sans-serif; font-weight:800; font-size:20px; letter-spacing:-0.02em;" id="profileName">Aurora User</div>
-        <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="planBadge">Бесплатный план</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="planBadge">Бесплатный план · 0 достижений</div>
       </div>
 
-      <div class="stats" style="margin-top:8px;">
+      <div class="stats" style="margin-top:4px;">
         <div class="stat"><b id="pMsg">0</b><small>сообщений</small></div>
         <div class="stat"><b id="pDay">1</b><small>дней подряд</small></div>
         <div class="stat"><b id="pBond">10%</b><small>близость</small></div>
       </div>
 
-      <div style="background:var(--surface); border:1px solid var(--stroke); border-radius:var(--r-md); padding:14px; margin-bottom:10px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-          <div>
-            <div style="font-size:13px; font-weight:700;">Эссенция</div>
-            <div style="font-size:11px; color:var(--muted);">Внутренняя валюта</div>
-          </div>
-          <div style="font-family:'Unbounded', sans-serif; font-weight:800; font-size:20px; color:var(--amber);" id="pEssence">100</div>
-        </div>
-        <button id="topupBtn" style="width:100%; padding:9px; border-radius:9px; background:var(--surface-2); border:1px solid var(--stroke); color:#fff; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer;">
-          + Получить эссенцию (скоро)
-        </button>
+      <!-- Theme picker -->
+      <div class="sec-head" style="margin-top:14px;">
+        <div class="sec-title">Тема оформления</div>
       </div>
+      <div class="theme-grid" id="themeGrid"></div>
 
-      <button id="dailyBtn" style="width:100%; padding:14px; border-radius:var(--r-md); background:linear-gradient(135deg,#f472b6,#a855f7); color:#fff; border:none; font-family:inherit; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:14px; box-shadow:0 6px 16px rgba(244,114,182,0.35);">
+      <!-- Avatar picker -->
+      <div class="sec-head">
+        <div class="sec-title">Аватар</div>
+      </div>
+      <div class="avatar-grid" id="avatarGrid"></div>
+
+      <!-- Achievements -->
+      <div class="sec-head" style="margin-top:8px;">
+        <div class="sec-title">Достижения</div>
+        <span style="font-size:11px; color:var(--muted);" id="achCount">0 / 10</span>
+      </div>
+      <div class="ach-grid" id="achGrid"></div>
+
+      <!-- Essence + Daily -->
+      <div class="sec-head" style="margin-top:8px;">
+        <div class="sec-title">Эссенция</div>
+        <span style="font-family:'Unbounded', sans-serif; font-weight:800; font-size:14px; color:var(--amber);" id="pEssence">100</span>
+      </div>
+      <button id="dailyBtn" style="width:100%; padding:13px; border-radius:var(--r-md); background:var(--grad-main); color:#fff; border:none; font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; margin-bottom:10px; box-shadow:0 6px 16px rgba(244,114,182,0.35);">
         🎁 Забрать ежедневную награду
       </button>
+      <button id="topupBtn" style="width:100%; padding:11px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--stroke); color:#fff; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:14px;">
+        + Получить эссенцию (скоро)
+      </button>
 
+      <!-- Premium -->
       <div class="premium">
         <div class="prem-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7 7 .6-5.3 4.6L18 22l-6-4-6 4 1.3-7.8L2 9.6 9 9l3-7Z"/></svg>
@@ -660,7 +842,32 @@
       </div>
 
       <div style="text-align:center; padding:12px 0 24px; font-size:10px; color:var(--muted-2);">
-        Aurora v1.0 · AI Companion
+        Aurora v2.0 · AI Companion
+      </div>
+    </div>
+
+    <!-- VIEW: MORE (FAQ) -->
+    <div class="view" data-view="more">
+      <div class="sec-head">
+        <div class="sec-title">Частые вопросы</div>
+      </div>
+      <div id="faqList"></div>
+
+      <div class="sec-head" style="margin-top:18px;">
+        <div class="sec-title">О приложении</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--stroke); border-radius:var(--r-md); padding:14px; font-size:12px; color:var(--muted); line-height:1.6;">
+        <b style="color:#fff;">Aurora v2.0</b> — AI-компаньон для душевных разговоров в Telegram. 4 уникальных персонажа с разными характерами: Aurora, Luna, Nexus, Zephyr.<br><br>
+        <b style="color:#fff;">AI движок:</b> Pollinations (бесплатно)<br>
+        <b style="color:#fff;">Платформа:</b> Telegram Mini App<br>
+        <b style="color:#fff;">Хостинг:</b> GitHub Pages<br><br>
+        Все разговоры приватные и не передаются третьим лицам. Персонажи — вымышленные ИИ-личности.
+      </div>
+
+      <div class="credit" style="margin-top:14px;">
+        <div class="credit-label">Made by</div>
+        <div class="credit-name">SKUFI4</div>
+        <div class="credit-handle">@skufi4 · developer</div>
       </div>
     </div>
 
@@ -679,6 +886,10 @@
     <div class="nav-item" data-nav="profile">
       <div class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
       Профиль
+    </div>
+    <div class="nav-item" data-nav="more">
+      <div class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></div>
+      Ещё
     </div>
   </div>
 
@@ -793,14 +1004,217 @@ const CHARS = [
   },
 ];
 
-/* ===== STATE ===== */
+/* ===== STATE (with localStorage persistence) ===== */
+const STORAGE_KEY = 'aurora_state_v2';
+
 let state = {
   selected: CHARS[0],
-  messages: {}, // char_id -> array of {role, text, ts}
+  messages: {},          // char_id -> array of {role, text, ts}
+  memories: {},          // char_id -> array of facts about user
   essence: 100,
   totalMessages: 0,
   streak: 1,
   dailyClaimed: false,
+  dailyStreak: 0,
+  theme: 'aurora',       // aurora | midnight | forest | sunset | mono
+  avatar: '🌸',          // emoji avatar
+  achievements: [],      // array of unlocked achievement ids
+  charsTalkedTo: [],     // ids of characters user has chatted with
+  lastChatTime: null,    // for "night owl" achievement
+  longestMessage: 0,
+};
+
+// Load state from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Merge with defaults (so new fields don't break old saves)
+      Object.assign(state, parsed);
+      // Restore selected character reference (it's an object)
+      if (parsed.selectedId) {
+        const c = CHARS.find(x => x.id === parsed.selectedId);
+        if (c) state.selected = c;
+      }
+      // Restore character bond levels
+      if (parsed.charBonds) {
+        Object.entries(parsed.charBonds).forEach(([id, bond]) => {
+          const c = CHARS.find(x => x.id === id);
+          if (c) c.bond = bond;
+        });
+      }
+      console.log('[state] loaded from localStorage');
+    }
+  } catch(e) { console.warn('[state] load failed', e); }
+}
+
+// Save state to localStorage
+function saveState() {
+  try {
+    const toSave = {
+      ...state,
+      selectedId: state.selected.id,
+      charBonds: Object.fromEntries(CHARS.map(c => [c.id, c.bond])),
+      selected: undefined,  // don't save object reference
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch(e) { console.warn('[state] save failed', e); }
+}
+
+// Auto-save on every meaningful change
+setInterval(saveState, 5000);  // every 5s
+window.addEventListener('beforeunload', saveState);
+
+/* ===== THEMES ===== */
+const THEMES = [
+  { id: 'aurora', name: 'Aurora', preview: 'linear-gradient(135deg,#f472b6,#a855f7)' },
+  { id: 'midnight', name: 'Midnight', preview: 'linear-gradient(135deg,#60a5fa,#6366f1)' },
+  { id: 'forest', name: 'Forest', preview: 'linear-gradient(135deg,#34d399,#14b8a6)' },
+  { id: 'sunset', name: 'Sunset', preview: 'linear-gradient(135deg,#fb923c,#f87171)' },
+  { id: 'mono', name: 'Mono', preview: 'linear-gradient(135deg,#e5e7eb,#9ca3af)' },
+];
+
+function applyTheme(themeId) {
+  if (themeId === 'aurora') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', themeId);
+  }
+  state.theme = themeId;
+  // Update TG header color to match
+  if (tg) {
+    const colors = {
+      aurora: '#0a0a14',
+      midnight: '#0a0f1e',
+      forest: '#0a1410',
+      sunset: '#1a0e0a',
+      mono: '#0d0d0f',
+    };
+    try { if (tg.setHeaderColor) tg.setHeaderColor(colors[themeId]); } catch(e) {}
+    try { if (tg.setBackgroundColor) tg.setBackgroundColor(colors[themeId]); } catch(e) {}
+  }
+  saveState();
+}
+
+/* ===== AVATARS ===== */
+const AVATARS = ['🌸', '🌙', '🔥', '⚡', '💜', '✨', '🦊', '🐱', '🐼', '🦄', '🐲', '🌟'];
+
+/* ===== ACHIEVEMENTS (10) ===== */
+const ACHIEVEMENTS = [
+  { id: 'first_msg', icon: '💬', name: 'Первый разговор', desc: '1 сообщение', check: () => state.totalMessages >= 1 },
+  { id: 'msg_10', icon: '🗣️', name: 'Болтун', desc: '10 сообщений', check: () => state.totalMessages >= 10 },
+  { id: 'msg_50', icon: '📢', name: 'Душа компании', desc: '50 сообщений', check: () => state.totalMessages >= 50 },
+  { id: 'msg_100', icon: '🏆', name: '100 сообщений', desc: '100 сообщений', check: () => state.totalMessages >= 100 },
+  { id: 'streak_7', icon: '📅', name: 'Неделя подряд', desc: '7 дней стрик', check: () => state.streak >= 7 },
+  { id: 'all_chars', icon: '👥', name: 'Все свои', desc: 'Все 4 персонажа', check: () => state.charsTalkedTo.length >= 4 },
+  { id: 'bond_100', icon: '💗', name: 'Близость', desc: '100% bond', check: () => CHARS.some(c => c.bond >= 100) },
+  { id: 'daily_7', icon: '🎁', name: 'Коллекционер', desc: '7 дней наград', check: () => state.dailyStreak >= 7 },
+  { id: 'night_owl', icon: '🦉', name: 'Сова', desc: 'Чат после 2:00', check: () => state.lastNightChat },
+  { id: 'long_msg', icon: '📝', name: 'Писатель', desc: 'Сообщение 100+ симв.', check: () => state.longestMessage >= 100 },
+];
+
+function checkAchievements() {
+  let unlocked = false;
+  ACHIEVEMENTS.forEach(a => {
+    if (!state.achievements.includes(a.id) && a.check()) {
+      state.achievements.push(a.id);
+      toast(`🏆 Достижение: ${a.name}!`);
+      haptic('success');
+      unlocked = true;
+    }
+  });
+  if (unlocked) saveState();
+  return unlocked;
+}
+
+/* ===== FAQ ===== */
+const FAQ = [
+  { q: 'Что такое Aurora?', a: 'Aurora — это AI-компаньон для душевных разговоров в Telegram. 4 уникальных персонажа с разными характерами всегда готовы поболтать.' },
+  { q: 'Это бесплатно?', a: 'Да! Базовые функции бесплатны навсегда: 2 персонажа (Aurora и Luna), безлим сообщений. PRO-подписка откроет Nexus, Zephyr и голосовые ответы (скоро).' },
+  { q: 'Персонажи реальные люди?', a: 'Нет. Все персонажи — вымышленные ИИ-личности, созданные с помощью языковых моделей. Они не являются реальными людьми.' },
+  { q: 'Они помнят наши разговоры?', a: 'Да! Персонажи запоминают факты о тебе (имя, интересы) в рамках одной сессии. Сохранение между сессиями работает через localStorage браузера.' },
+  { q: 'Как получить PRO?', a: 'PRO-подписка будет доступна через Telegram Stars (внутренняя валюта TG). Сейчас кнопка "Скоро" — подписка будет активирована в ближайшее время.' },
+  { q: 'Безопасно ли это?', a: 'Да. Все разговоры идут напрямую через AI API (Pollinations) — мы не храним ваши сообщения на серверах. Данные сохраняются только локально в вашем браузере.' },
+  { q: 'Как работает система близости?', a: 'Bond meter (полоса близости) растёт на +5 XP за каждое твоё сообщение. Каждые 100 XP = новый уровень. Чем выше уровень, тем "ближе" персонаж к тебе.' },
+  { q: 'Что такое эссенция?', a: 'Эссенция — внутренняя валюта Aurora. Получаешь за ежедневные награды. В будущем можно будет тратить на кастомизацию, новые персонажи и голосовые ответы.' },
+  { q: 'AI отвечает долго, это нормально?', a: 'Бесплатный AI (Pollinations) отвечает за 3-8 секунд. Иногда при большой нагрузке может быть дольше. Если ответа нет дольше 15 секунд — сработает fallback на скриптовые ответы.' },
+  { q: 'Как связаться с разработчиком?', a: 'Aurora разработана @skufi4. Для предложений и баг-репортов пишите в Telegram.' },
+];
+
+/* ===== MEMORY SYSTEM =====
+ * Extracts facts about the user from messages and includes them
+ * in the system prompt so the character "remembers".
+ */
+const MEMORY = {
+  // Extract facts from user message using simple patterns
+  extract(text) {
+    const facts = [];
+    const lower = text.toLowerCase();
+
+    // Name extraction: "меня зовут X", "я X", "моё имя X"
+    const nameMatch = lower.match(/(?:меня зовут|я |моё имя|мое имя)\s+([а-яёa-z]{2,20})/i);
+    if (nameMatch && nameMatch[1] && !['был', 'была', 'хочу', 'могу', 'думаю', 'чувствую', 'люблю'].includes(nameMatch[1])) {
+      const name = nameMatch[1][0].toUpperCase() + nameMatch[1].slice(1);
+      facts.push({ type: 'name', value: name });
+    }
+
+    // Likes: "я люблю X", "мне нравится X"
+    const likeMatch = lower.match(/(?:я люблю|мне нравится|обожаю)\s+([а-яёa-z\s]{2,40})/i);
+    if (likeMatch) facts.push({ type: 'like', value: likeMatch[1].trim() });
+
+    // Dislikes: "ненавижу X", "не люблю X"
+    const dislikeMatch = lower.match(/(?:ненавижу|не люблю|терпеть не могу)\s+([а-яёa-z\s]{2,40})/i);
+    if (dislikeMatch) facts.push({ type: 'dislike', value: dislikeMatch[1].trim() });
+
+    // Age: "мне X лет"
+    const ageMatch = lower.match(/мне\s+(\d{1,2})\s+лет/);
+    if (ageMatch) facts.push({ type: 'age', value: ageMatch[1] });
+
+    // City: "я из X", "живу в X"
+    const cityMatch = lower.match(/(?:я из|живу в|из города)\s+([а-яёa-z]{2,20})/i);
+    if (cityMatch) facts.push({ type: 'city', value: cityMatch[1].trim() });
+
+    // Work: "работаю X", "я X по профессии"
+    const workMatch = lower.match(/(?:работаю|я работаю|по профессии)\s+([а-яёa-z\s]{2,30})/i);
+    if (workMatch) facts.push({ type: 'work', value: workMatch[1].trim() });
+
+    return facts;
+  },
+
+  // Add facts to character's memory (deduplicated)
+  add(charId, facts) {
+    if (!facts.length) return;
+    if (!state.memories[charId]) state.memories[charId] = [];
+    facts.forEach(f => {
+      // Don't add duplicate of same type+value
+      const exists = state.memories[charId].some(m => m.type === f.type && m.value === f.value);
+      if (!exists) {
+        // Replace if same type (e.g. new name)
+        state.memories[charId] = state.memories[charId].filter(m => m.type !== f.type);
+        state.memories[charId].push(f);
+      }
+    });
+    saveState();
+  },
+
+  // Format memories as text for system prompt
+  formatForPrompt(charId) {
+    const mems = state.memories[charId] || [];
+    if (!mems.length) return '';
+    const lines = mems.map(m => {
+      const labels = {
+        name: 'имя пользователя',
+        like: 'любит',
+        dislike: 'не любит',
+        age: 'возраст',
+        city: 'город',
+        work: 'профессия',
+      };
+      return `- ${labels[m.type] || m.type}: ${m.value}`;
+    });
+    return '\n\nИЗВЕСТНО О ПОЛЬЗОВАТЕЛЕ:\n' + lines.join('\n') + '\n\n(Используй эти знания естественно, не упоминай что ты "запомнил". Если уместно — обращайся по имени.)';
+  },
 };
 
 const $ = id => document.getElementById(id);
@@ -908,9 +1322,12 @@ const AI_ENGINE = {
     if (!this.useAI) return null;
     try {
       const sys = this.systemPrompts[charId] || this.systemPrompts.aurora;
+      // Append memories to system prompt so character "remembers"
+      const memText = MEMORY.formatForPrompt(charId);
+      const fullSys = sys + memText;
       const prompt = userText;
       // Build URL: text.pollinations.ai/{encoded prompt}?system={encoded system}
-      const url = `${this.endpoint}${encodeURIComponent(prompt)}?system=${encodeURIComponent(sys)}&model=openai`;
+      const url = `${this.endpoint}${encodeURIComponent(prompt)}?system=${encodeURIComponent(fullSys)}&model=openai`;
 
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), this.timeout);
@@ -1161,6 +1578,20 @@ function addMessage(charId, role, text) {
 
   if (role === 'me') {
     state.totalMessages++;
+    // Track longest message
+    if (text.length > state.longestMessage) state.longestMessage = text.length;
+    // Track night chat (after 2:00 AM)
+    const hour = new Date().getHours();
+    if (hour >= 2 && hour < 5) state.lastNightChat = true;
+    state.lastChatTime = Date.now();
+    // Track which characters user talked to
+    if (!state.charsTalkedTo.includes(charId)) state.charsTalkedTo.push(charId);
+    // Extract memories from user message
+    const facts = MEMORY.extract(text);
+    if (facts.length) {
+      MEMORY.add(charId, facts);
+      console.log('[memory] extracted:', facts);
+    }
     // Increase bond
     const c = CHARS.find(x => x.id === charId);
     if (c) {
@@ -1168,7 +1599,54 @@ function addMessage(charId, role, text) {
       updateBond(c);
     }
     updateStats();
+    checkAchievements();
+    saveState();
   }
+}
+
+/* ===== STREAMER TYPING — print text word-by-word ===== */
+function streamMessage(charId, text) {
+  return new Promise((resolve) => {
+    // Create the message div with empty content
+    const div = document.createElement('div');
+    div.className = 'msg them';
+    div.id = 'streaming-msg';
+    $('messages').appendChild(div);
+    scrollMessagesToBottom();
+
+    // Save to state immediately
+    if (!state.messages[charId]) state.messages[charId] = [];
+    state.messages[charId].push({ role: 'them', text, ts: Date.now() });
+
+    // Split into words, preserve spaces and newlines
+    const words = text.split(/(\s+)/);
+    let displayed = '';
+    let i = 0;
+
+    // Variable speed: faster for long messages
+    const baseDelay = text.length > 200 ? 25 : 40;
+    const jitter = 20;  // random 0-20ms added
+
+    function next() {
+      if (i >= words.length) {
+        div.textContent = text;  // final clean text
+        scrollMessagesToBottom();
+        resolve();
+        return;
+      }
+      displayed += words[i];
+      div.innerHTML = escapeHtml(displayed) + '<span class="cursor"></span>';
+      scrollMessagesToBottom();
+      i++;
+      // Longer pause on sentence enders
+      const last = words[i - 1] || '';
+      const pause = /[.!?…]\s*$/.test(last) ? baseDelay * 4 :
+                    /[,;:—–]\s*$/.test(last) ? baseDelay * 2 :
+                    baseDelay + Math.random() * jitter;
+      setTimeout(next, pause);
+    }
+    next();
+  });
 }
 
 function scrollMessagesToBottom() {
@@ -1251,7 +1729,8 @@ async function sendMessage() {
   }
 
   hideTyping();
-  addMessage(state.selected.id, 'them', reply);
+  // Stream the response word-by-word for natural feel
+  await streamMessage(state.selected.id, reply);
   haptic('success');
 }
 
@@ -1321,7 +1800,103 @@ function updateProfile() {
     const u = tg.initDataUnsafe.user;
     if (u.first_name) $('profileName').textContent = u.first_name + (u.last_name ? ' ' + u.last_name : '');
   }
+  // Update avatar
+  const av = $('profileAvatar');
+  if (av) av.textContent = state.avatar;
+  // Update plan badge with achievement count
+  const plan = $('planBadge');
+  if (plan) plan.textContent = `Бесплатный план · ${state.achievements.length} достижений`;
   updateStats();
+  renderThemeGrid();
+  renderAvatarGrid();
+  renderAchievements();
+}
+
+/* ===== THEME PICKER ===== */
+function renderThemeGrid() {
+  const grid = $('themeGrid');
+  if (!grid) return;
+  grid.innerHTML = THEMES.map(t => `
+    <div class="theme-btn ${state.theme === t.id ? 'active' : ''}"
+         data-theme="${t.id}"
+         style="--theme-preview:${t.preview};"
+         title="${t.name}">
+      <div class="check">✓</div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.theme-btn').forEach(el => {
+    el.onclick = () => {
+      haptic('selection');
+      applyTheme(el.dataset.theme);
+      renderThemeGrid();
+      toast(`Тема: ${THEMES.find(t => t.id === el.dataset.theme).name}`);
+    };
+  });
+}
+
+/* ===== AVATAR PICKER ===== */
+function renderAvatarGrid() {
+  const grid = $('avatarGrid');
+  if (!grid) return;
+  grid.innerHTML = AVATARS.map(emoji => `
+    <div class="avatar-btn ${state.avatar === emoji ? 'active' : ''}" data-avatar="${emoji}">${emoji}</div>
+  `).join('');
+  grid.querySelectorAll('.avatar-btn').forEach(el => {
+    el.onclick = () => {
+      haptic('selection');
+      state.avatar = el.dataset.avatar;
+      const av = $('profileAvatar');
+      if (av) av.textContent = state.avatar;
+      renderAvatarGrid();
+      saveState();
+      toast(`Аватар: ${state.avatar}`);
+    };
+  });
+}
+
+/* ===== ACHIEVEMENTS ===== */
+function renderAchievements() {
+  const grid = $('achGrid');
+  if (!grid) return;
+  grid.innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = state.achievements.includes(a.id);
+    return `
+      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
+        <span class="ach-icon">${a.icon}</span>
+        <div class="ach-name">${a.name}</div>
+        <div class="ach-desc">${a.desc}</div>
+      </div>
+    `;
+  }).join('');
+  const count = $('achCount');
+  if (count) count.textContent = `${state.achievements.length} / ${ACHIEVEMENTS.length}`;
+}
+
+/* ===== FAQ ===== */
+function renderFAQ() {
+  const list = $('faqList');
+  if (!list) return;
+  list.innerHTML = FAQ.map((item, i) => `
+    <div class="faq-item" data-i="${i}">
+      <div class="faq-q">
+        <span>${item.q}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="faq-a">${item.a}</div>
+    </div>
+  `).join('');
+  list.querySelectorAll('.faq-item').forEach(el => {
+    el.querySelector('.faq-q').onclick = () => {
+      const wasOpen = el.classList.contains('open');
+      // Close all
+      list.querySelectorAll('.faq-item').forEach(x => x.classList.remove('open'));
+      // Open this one (if it was closed)
+      if (!wasOpen) {
+        el.classList.add('open');
+        haptic('light');
+      }
+    };
+  });
 }
 
 /* ===== DAILY REWARD ===== */
@@ -1331,7 +1906,7 @@ $('dailyBtn').onclick = () => {
     haptic('warning');
     return;
   }
-  const reward = 20 + state.streak * 5; // 25, 30, 35...
+  const reward = 20 + state.dailyStreak * 5; // 25, 30, 35...
   $('rewardAmount').textContent = '+' + reward;
   $('dailyModal').classList.add('show');
   haptic('success');
@@ -1339,9 +1914,11 @@ $('dailyBtn').onclick = () => {
   $('modalClaim').onclick = () => {
     state.essence += reward;
     state.dailyClaimed = true;
-    state.streak++;
+    state.dailyStreak++;
     $('dailyModal').classList.remove('show');
     updateStats();
+    checkAchievements();
+    saveState();
     toast(`+${reward} эссенции! 🔥`);
     haptic('success');
   };
@@ -1367,7 +1944,10 @@ $('topupBtn').onclick = () => { haptic('warning'); toast('💳 Пополнен�
 $('balanceBtn').onclick = () => { haptic('light'); toast(`У тебя ${state.essence} эссенции`); };
 
 /* ===== INIT ===== */
+loadState();
+applyTheme(state.theme);
 renderActiveChars();
+renderFAQ();
 updateBond(state.selected);
 updateStats();
 </script>
