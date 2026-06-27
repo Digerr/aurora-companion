@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#0a0a14" />
+<title>Aurora — AI Companion</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin:0; padding:0; }
+  :root{
+    --bg:#0a0a14;
+    --bg-2:#13131f;
+    --surface:rgba(255,255,255,0.04);
+    --surface-2:rgba(255,255,255,0.08);
+    --stroke:rgba(255,255,255,0.08);
+    --stroke-2:rgba(255,255,255,0.16);
+    --text:#fff;
+    --muted:#9ca3af;
+    --muted-2:#6b7280;
+    --aurora-1:#f472b6;  /* pink */
+    --aurora-2:#a855f7;  /* violet */
+    --aurora-3:#22d3ee;  /* cyan */
+    --luna-1:#67e8f9;
+    --luna-2:#3b82f6;
+    --luna-3:#6366f1;
+    --nexus-1:#fb923c;
+    --nexus-2:#ef4444;
+    --nexus-3:#f59e0b;
+    --zephyr-1:#a3e635;
+    --zephyr-2:#10b981;
+    --zephyr-3:#22d3ee;
+    --amber:#f5a623;
+    --lime:#a3e635;
+    --r-lg: 22px;
+    --r-md: 16px;
+    --r-sm: 12px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html,body{
+    height:100%; background:#0a0a14; color:var(--text);
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  body{
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(1000px 700px at 50% -10%, rgba(244,114,182,0.10), transparent 60%),
+      radial-gradient(800px 500px at 100% 100%, rgba(168,85,247,0.10), transparent 60%),
+      #000;
+  }
+
+  .phone{
+    position:relative;
+    width:min(430px, 100vw);
+    height:min(932px, 100vh);
+    background:var(--bg);
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  }
+  @media (max-width: 430px){ .phone{ width:100vw; height:100vh; box-shadow:none; } }
+
+  /* Ambient background */
+  .ambient{ position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.30; animation: float 18s ease-in-out infinite; }
+  .blob.a{ width:340px; height:340px; background:#f472b6; top:-80px; left:-80px; }
+  .blob.b{ width:300px; height:300px; background:#a855f7; bottom:-60px; right:-80px; animation-delay:-6s; opacity:.25; }
+  .blob.c{ width:240px; height:240px; background:#22d3ee; top:40%; right:-100px; opacity:.18; animation-delay:-3s; }
+  @keyframes float{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(20px,-30px) scale(1.08); }
+  }
+
+  /* Top bar */
+  .topbar{
+    position:relative; z-index:5;
+    padding: calc(12px + var(--safe-top)) 16px 10px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .logo{
+    width:38px; height:38px; border-radius:12px;
+    display:grid; place-items:center;
+    box-shadow: 0 8px 24px rgba(244,114,182,0.35), inset 0 0 0 1px rgba(255,255,255,0.18);
+  }
+  .logo svg{ width:20px; height:20px; color:#fff; }
+  .brand-name{ font-family:'Unbounded', sans-serif; font-weight:900; font-size:18px; letter-spacing:-0.03em; line-height:1; }
+  .brand-tag{ font-size:10px; color:var(--muted); margin-top:4px; letter-spacing:0.04em; font-weight:600; }
+  .balance{
+    display:flex; align-items:center; gap:7px;
+    background:var(--surface); border:1px solid var(--stroke);
+    padding:7px 11px 7px 8px; border-radius:999px;
+    font-weight:700; font-size:13px;
+  }
+  .essence{
+    width:20px; height:20px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, #fde68a, #f472b6);
+    box-shadow: 0 0 12px rgba(244,114,182,0.6), inset 0 0 0 1px rgba(255,255,255,0.3);
+    display:grid; place-items:center; font-size:10px; font-weight:800; color:#7c2d12;
+  }
+
+  /* Tabs */
+  .tabs{
+    position:relative; z-index:5;
+    margin: 6px 16px 0;
+    display:flex; background:var(--surface); border:1px solid var(--stroke);
+    padding:4px; border-radius:14px; gap:2px;
+  }
+  .tab{
+    flex:1; text-align:center; padding:9px 0;
+    font-size:13px; font-weight:600; color:var(--muted);
+    border-radius:10px; cursor:pointer; transition:.2s;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .tab svg{ width:14px; height:14px; }
+  .tab.active{ background:var(--surface-2); color:#fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+  /* Scroll area */
+  .scroll{
+    position:relative; z-index:2;
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    padding: 14px 0 110px;
+    scrollbar-width:none;
+  }
+  .scroll::-webkit-scrollbar{ display:none; }
+  .view{ display:none; padding: 0 16px; }
+  .view.active{ display:block; animation: fadein .3s ease; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none; } }
+
+  /* Section header */
+  .sec-head{ display:flex; align-items:center; justify-content:space-between; margin: 4px 0 12px; }
+  .sec-title{ font-size:15px; font-weight:700; letter-spacing:-0.01em; }
+  .sec-link{ font-size:12px; color:var(--aurora-1); font-weight:600; cursor:pointer; background:none; border:none; font-family:inherit; }
+
+  /* Character cards */
+  .char-list{ display:flex; flex-direction:column; gap:11px; }
+  .char-card{
+    position:relative; overflow:hidden;
+    background:var(--surface); border:1px solid var(--stroke);
+    border-radius:var(--r-lg); padding:14px;
+    display:flex; align-items:center; gap:14px;
+    cursor:pointer; transition:.2s;
+  }
+  .char-card:active{ transform:scale(0.98); }
+  .char-card::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background: var(--char-grad);
+  }
+  .char-card.active{
+    background: var(--surface-2);
+    border-color: var(--char-color);
+    box-shadow: 0 0 0 1px var(--char-color), 0 8px 24px var(--char-shadow);
+  }
+  .char-avatar{
+    width:60px; height:60px; border-radius:50%; flex-shrink:0;
+    background: var(--char-grad);
+    display:grid; place-items:center;
+    font-family:'Unbounded', sans-serif; font-weight:800; font-size:22px; color:#fff;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18);
+    position:relative;
+  }
+  .char-avatar::after{
+    content:''; position:absolute; right:-2px; bottom:-2px;
+    width:14px; height:14px; border-radius:50%;
+    background: var(--lime); border:2.5px solid var(--bg);
+  }
+  .char-card.busy .char-avatar::after{ background: var(--amber); }
+  .char-info{ flex:1; min-width:0; }
+  .char-name{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .char-name .pro-tag{
+    background: rgba(245,166,35,0.2); color: var(--amber);
+    font-size:9px; font-weight:800; padding:2px 6px; border-radius:5px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .char-desc{ font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
+  .char-status{ display:flex; align-items:center; gap:6px; margin-top:6px; font-size:11px; color:var(--muted); }
+  .char-status .dot{ width:6px; height:6px; border-radius:50%; background:var(--lime); }
+
+  /* Stats row */
+  .stats{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
+  .stat{
+    background:var(--surface); border:1px solid var(--stroke);
+    border-radius:var(--r-md); padding:11px 8px; text-align:center;
+  }
+  .stat b{ display:block; font-family:'Unbounded', sans-serif; font-weight:800; font-size:18px; color: var(--aurora-1); line-height:1.1; }
+  .stat small{ font-size:10px; color:var(--muted); display:block; margin-top:3px; }
+
+  /* Bond meter */
+  .bond-card{
+    background: var(--surface); border:1px solid var(--stroke);
+    border-radius:var(--r-md); padding:14px; margin-bottom:14px;
+  }
+  .bond-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .bond-title{ font-size:13px; font-weight:700; }
+  .bond-level{
+    font-family:'Unbounded', sans-serif; font-weight:800; font-size:14px;
+    color: var(--char-color, var(--aurora-1));
+  }
+  .bond-bar{
+    height:8px; background: rgba(255,255,255,0.08);
+    border-radius:4px; overflow:hidden;
+  }
+  .bond-fill{
+    height:100%; background: var(--char-grad, linear-gradient(90deg,#f472b6,#a855f7));
+    border-radius:4px; transition: width .6s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 12px var(--char-color, #f472b6);
+  }
+  .bond-meta{ display:flex; justify-content:space-between; margin-top:6px; font-size:10px; color:var(--muted); }
+
+  /* Chat */
+  .chat-wrap{ display:flex; flex-direction:column; height:100%; }
+  .chat-header{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 0 12px;
+    border-bottom:1px solid var(--stroke);
+    margin-bottom:12px;
+  }
+  .chat-back{
+    width:32px; height:32px; border-radius:9px;
+    background:var(--surface-2); border:1px solid var(--stroke);
+    display:grid; place-items:center; cursor:pointer; color:#fff;
+  }
+  .chat-back svg{ width:14px; height:14px; }
+  .chat-avatar{
+    width:36px; height:36px; border-radius:50%;
+    background: var(--char-grad);
+    display:grid; place-items:center;
+    font-family:'Unbounded', sans-serif; font-weight:800; font-size:13px; color:#fff;
+  }
+  .chat-info{ flex:1; }
+  .chat-name{ font-size:14px; font-weight:700; }
+  .chat-status{ font-size:11px; color:var(--lime); display:flex; align-items:center; gap:4px; }
+  .chat-status .dot{ width:6px; height:6px; border-radius:50%; background:var(--lime); animation: pulse 2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+  .chat-messages{
+    flex:1; overflow-y:auto; padding:4px 0 12px;
+    display:flex; flex-direction:column; gap:10px;
+    scrollbar-width:none;
+  }
+  .chat-messages::-webkit-scrollbar{ display:none; }
+
+  .msg{
+    max-width:80%; padding:10px 14px;
+    border-radius:16px; font-size:14px; line-height:1.45;
+    word-wrap: break-word;
+    animation: msgin .25s ease;
+  }
+  @keyframes msgin{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none; } }
+  .msg.them{
+    align-self:flex-start;
+    background: var(--surface-2); border:1px solid var(--stroke);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.me{
+    align-self:flex-end;
+    background: var(--char-grad, linear-gradient(135deg,#f472b6,#a855f7));
+    color:#fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.typing{
+    align-self:flex-start;
+    background: var(--surface-2); border:1px solid var(--stroke);
+    border-bottom-left-radius: 4px;
+    padding:14px 16px;
+  }
+  .typing-dots{ display:inline-flex; gap:3px; }
+  .typing-dots span{
+    width:6px; height:6px; border-radius:50%; background:var(--muted);
+    animation: typing 1.4s infinite;
+  }
+  .typing-dots span:nth-child(2){ animation-delay:.2s; }
+  .typing-dots span:nth-child(3){ animation-delay:.4s; }
+  @keyframes typing{
+    0%,60%,100%{ transform:translateY(0); opacity:.4; }
+    30%{ transform:translateY(-4px); opacity:1; }
+  }
+
+  .chat-input{
+    position:relative; z-index:5;
+    padding:10px 16px calc(12px + var(--safe-bottom));
+    background: rgba(10,10,20,0.95);
+    backdrop-filter: blur(20px);
+    border-top:1px solid var(--stroke);
+    display:flex; gap:8px; align-items:flex-end;
+  }
+  .chat-input textarea{
+    flex:1; min-height:40px; max-height:120px; resize:none;
+    background:var(--surface); border:1px solid var(--stroke);
+    border-radius:20px; padding:10px 14px;
+    color:#fff; font-family:inherit; font-size:14px; line-height:1.4;
+    outline:none;
+  }
+  .chat-input textarea:focus{ border-color: var(--char-color, var(--aurora-1)); }
+  .send-btn{
+    width:40px; height:40px; border-radius:50%; border:none;
+    background: var(--char-grad, linear-gradient(135deg,#f472b6,#a855f7));
+    color:#fff; cursor:pointer;
+    display:grid; place-items:center; flex-shrink:0;
+    box-shadow: 0 4px 12px var(--char-shadow, rgba(244,114,182,0.4));
+  }
+  .send-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .send-btn svg{ width:16px; height:16px; margin-left:1px; }
+
+  /* Suggestion chips */
+  .suggest-row{
+    display:flex; gap:6px; overflow-x:auto; padding-bottom:8px;
+    scrollbar-width:none;
+  }
+  .suggest-row::-webkit-scrollbar{ display:none; }
+  .suggest{
+    flex:0 0 auto; padding:7px 12px; border-radius:999px;
+    background:var(--surface); border:1px solid var(--stroke);
+    color:var(--muted); font-size:12px; cursor:pointer;
+    transition:.2s; white-space:nowrap;
+  }
+  .suggest:hover{ background:var(--surface-2); color:#fff; }
+
+  /* Premium banner */
+  .premium{
+    margin: 14px 0 4px;
+    background: linear-gradient(135deg, rgba(245,166,35,0.16), rgba(244,114,182,0.10));
+    border:1px solid rgba(245,166,35,0.3);
+    border-radius:var(--r-lg); padding:14px;
+    display:flex; align-items:center; gap:12px;
+    position:relative; overflow:hidden;
+  }
+  .premium::before{
+    content:''; position:absolute; right:-30px; top:-30px;
+    width:100px; height:100px; border-radius:50%;
+    background: radial-gradient(circle, rgba(245,166,35,0.3), transparent 70%);
+  }
+  .prem-icon{
+    width:42px; height:42px; border-radius:12px;
+    background: linear-gradient(135deg, #f5a623, #ec4899);
+    display:grid; place-items:center; flex-shrink:0;
+    box-shadow: 0 6px 16px rgba(245,166,35,0.4);
+  }
+  .prem-icon svg{ width:22px; height:22px; color:#fff; }
+  .prem-text{ flex:1; }
+  .prem-text b{ font-size:13.5px; font-weight:800; display:block; }
+  .prem-text small{ font-size:11px; color:var(--muted); }
+  .prem-btn{
+    background:#fff; color:#000; border:none;
+    padding:8px 14px; border-radius:10px; font-weight:800; font-size:12px;
+    font-family:inherit; cursor:pointer; flex-shrink:0;
+  }
+  .prem-btn.disabled{ opacity:.5; cursor:not-allowed; }
+
+  /* Empty state */
+  .empty{ text-align:center; padding: 40px 20px; color: var(--muted); }
+  .empty-ico{
+    width:64px; height:64px; border-radius:50%;
+    background: var(--surface); border:1px solid var(--stroke);
+    display:grid; place-items:center; margin: 0 auto 14px;
+  }
+  .empty-ico svg{ width:28px; height:28px; color: var(--muted-2); }
+  .empty b{ display:block; font-size:14px; color:#fff; margin-bottom:5px; }
+  .empty small{ font-size:12px; }
+
+  /* Bottom nav */
+  .nav{
+    position:absolute; bottom:0; left:0; right:0; z-index:10;
+    padding: 10px 16px calc(10px + var(--safe-bottom));
+    background: rgba(10,10,20,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--stroke);
+    display:flex; justify-content:space-around;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    color:var(--muted-2); cursor:pointer; padding:4px 12px; border-radius:10px;
+    font-size:10px; font-weight:600; transition:.2s;
+  }
+  .nav-item svg{ width:21px; height:21px; }
+  .nav-item.active{ color:#fff; }
+  .nav-item.active .nav-ico{
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    color:#fff;
+  }
+  .nav-ico{
+    width:32px; height:32px; border-radius:10px;
+    display:grid; place-items:center; transition:.2s;
+  }
+
+  /* Toast */
+  .toast{
+    position:absolute; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+    background: rgba(20,20,30,0.95); backdrop-filter: blur(20px);
+    border:1px solid var(--stroke-2);
+    padding:11px 18px; border-radius:12px;
+    font-size:13px; font-weight:600; color:#fff;
+    z-index:50; opacity:0; pointer-events:none;
+    transition:.3s; display:flex; align-items:center; gap:8px;
+    white-space:nowrap; max-width:90vw;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast svg{ width:15px; height:15px; color: var(--lime); flex-shrink:0; }
+
+  /* Daily reward modal */
+  .modal-bg{
+    position:absolute; inset:0; z-index:100;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    display:none; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .modal-bg.show{ display:flex; animation: fadein .25s ease; }
+  .modal{
+    background: linear-gradient(135deg, rgba(244,114,182,0.15), rgba(168,85,247,0.10));
+    border:1px solid var(--stroke-2);
+    border-radius:var(--r-lg); padding:24px;
+    max-width:340px; width:100%; text-align:center;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:10px; right:10px;
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(255,255,255,0.08); border:none;
+    color:#fff; cursor:pointer; display:grid; place-items:center;
+  }
+  .modal-close svg{ width:14px; height:14px; }
+  .modal-icon{
+    width:64px; height:64px; border-radius:50%;
+    margin:0 auto 14px;
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    display:grid; place-items:center;
+    box-shadow: 0 8px 24px rgba(244,114,182,0.4);
+    animation: pulse-scale 2s infinite;
+  }
+  @keyframes pulse-scale{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+  .modal-icon svg{ width:32px; height:32px; color:#fff; }
+  .modal h3{ font-family:'Unbounded', sans-serif; font-weight:800; font-size:18px; margin-bottom:8px; }
+  .modal p{ font-size:13px; color:var(--muted); line-height:1.5; margin-bottom:16px; }
+  .modal-reward{
+    background: var(--surface-2); border:1px solid var(--stroke);
+    border-radius:var(--r-md); padding:12px; margin-bottom:16px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .modal-reward b{ font-family:'Unbounded', sans-serif; font-weight:800; font-size:20px; color:var(--amber); }
+  .modal-btn{
+    width:100%; padding:12px; border:none; border-radius:12px;
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    color:#fff; font-family:inherit; font-weight:800; font-size:14px;
+    cursor:pointer;
+    box-shadow: 0 6px 16px rgba(244,114,182,0.4);
+  }
+
+  /* Credit (Made by SKUFI4) */
+  .credit{
+    margin: 16px 0 4px;
+    text-align:center; padding:14px;
+    background: linear-gradient(135deg, rgba(244,114,182,0.06), rgba(34,211,238,0.05));
+    border:1px solid var(--stroke); border-radius:var(--r-md);
+  }
+  .credit-label{
+    font-size:9px; color:var(--muted-2);
+    letter-spacing:0.18em; text-transform:uppercase;
+    font-weight:700; margin-bottom:4px;
+  }
+  .credit-name{
+    font-family:'Unbounded', sans-serif; font-weight:800; font-size:14px;
+    color: var(--aurora-1); letter-spacing:0.02em;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .credit-name::before{
+    content:''; display:inline-block;
+    width:6px; height:6px; border-radius:50%;
+    background: var(--aurora-1);
+    box-shadow:0 0 8px var(--aurora-1);
+    animation: pulse 2s infinite;
+  }
+  .credit-handle{ font-size:11px; color:var(--muted); margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="ambient">
+    <div class="blob a"></div>
+    <div class="blob b"></div>
+    <div class="blob c"></div>
+  </div>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" id="logoBox" style="background:linear-gradient(135deg,#f472b6,#a855f7);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21s-7-4.5-9.5-9C.5 8 3 4 7 4c2 0 3.5 1 5 3 1.5-2 3-3 5-3 4 0 6.5 4 4.5 8C19 16.5 12 21 12 21Z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Aurora</div>
+        <div class="brand-tag">AI Companion</div>
+      </div>
+    </div>
+    <div class="balance" id="balanceBtn">
+      <div class="essence">✦</div>
+      <span id="essence">100</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 3l9 9M5 10v10h14V10"/></svg>
+      Главная
+    </div>
+    <div class="tab" data-tab="chars">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M3 21c0-3 2-5 6-5s6 2 6 5M15 21c0-3 2-5 6-5"/></svg>
+      Персонажи
+    </div>
+    <div class="tab" data-tab="profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      Профиль
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- VIEW: HOME -->
+    <div class="view active" data-view="home">
+      <div class="stats">
+        <div class="stat"><b id="stMsg">0</b><small>сообщений</small></div>
+        <div class="stat"><b id="stDay">1</b><small>дней подряд</small></div>
+        <div class="stat"><b id="stBond">10%</b><small>близость</small></div>
+      </div>
+
+      <div class="bond-card" id="bondCard">
+        <div class="bond-head">
+          <div class="bond-title">Близость с <span id="bondName">Aurora</span></div>
+          <div class="bond-level" id="bondLvl">Ур. 1</div>
+        </div>
+        <div class="bond-bar"><div class="bond-fill" id="bondFill" style="width:10%"></div></div>
+        <div class="bond-meta">
+          <span id="bondCur">10 / 100 XP</span>
+          <span>След. уровень →</span>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <div class="sec-title">Продолжить общение</div>
+        <button class="sec-link" data-jump="chars">Все →</button>
+      </div>
+
+      <div class="char-list" id="activeCharList"></div>
+
+      <div class="premium">
+        <div class="prem-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7 7 .6-5.3 4.6L18 22l-6-4-6 4 1.3-7.8L2 9.6 9 9l3-7Z"/></svg>
+        </div>
+        <div class="prem-text">
+          <b>Aurora PRO</b>
+          <small>Безлим сообщений · все 4 персонажа · голосовые</small>
+        </div>
+        <button class="prem-btn disabled" id="premBtn">Скоро</button>
+      </div>
+
+      <div class="credit">
+        <div class="credit-label">Made by</div>
+        <div class="credit-name">SKUFI4</div>
+        <div class="credit-handle">@skufi4 · developer</div>
+      </div>
+    </div>
+
+    <!-- VIEW: CHARS -->
+    <div class="view" data-view="chars">
+      <div class="sec-head">
+        <div class="sec-title">Выбери компаньона</div>
+      </div>
+      <div class="char-list" id="charList"></div>
+    </div>
+
+    <!-- VIEW: CHAT -->
+    <div class="view" data-view="chat" style="height:100%; padding:0;">
+      <div class="chat-wrap">
+        <div class="chat-header">
+          <button class="chat-back" id="chatBack">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="chat-avatar" id="chAvatar">A</div>
+          <div class="chat-info">
+            <div class="chat-name" id="chName">Aurora</div>
+            <div class="chat-status"><span class="dot"></span>печатает...</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="messages"></div>
+        <div class="suggest-row" id="suggestRow"></div>
+        <div class="chat-input">
+          <textarea id="msgInput" placeholder="Напиши сообщение..." rows="1"></textarea>
+          <button class="send-btn" id="sendBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: PROFILE -->
+    <div class="view" data-view="profile">
+      <div class="sec-head">
+        <div class="sec-title">Профиль</div>
+      </div>
+
+      <div style="text-align:center; padding:20px 16px 16px;">
+        <div id="profileAvatar" style="width:84px; height:84px; border-radius:50%; margin:0 auto 12px; background:linear-gradient(135deg,#f472b6,#a855f7); display:grid; place-items:center; box-shadow:0 8px 24px rgba(244,114,182,0.35), inset 0 0 0 3px rgba(255,255,255,0.18);">
+          <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+          </svg>
+        </div>
+        <div style="font-family:'Unbounded', sans-serif; font-weight:800; font-size:20px; letter-spacing:-0.02em;" id="profileName">Aurora User</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="planBadge">Бесплатный план</div>
+      </div>
+
+      <div class="stats" style="margin-top:8px;">
+        <div class="stat"><b id="pMsg">0</b><small>сообщений</small></div>
+        <div class="stat"><b id="pDay">1</b><small>дней подряд</small></div>
+        <div class="stat"><b id="pBond">10%</b><small>близость</small></div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--stroke); border-radius:var(--r-md); padding:14px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <div>
+            <div style="font-size:13px; font-weight:700;">Эссенция</div>
+            <div style="font-size:11px; color:var(--muted);">Внутренняя валюта</div>
+          </div>
+          <div style="font-family:'Unbounded', sans-serif; font-weight:800; font-size:20px; color:var(--amber);" id="pEssence">100</div>
+        </div>
+        <button id="topupBtn" style="width:100%; padding:9px; border-radius:9px; background:var(--surface-2); border:1px solid var(--stroke); color:#fff; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer;">
+          + Получить эссенцию (скоро)
+        </button>
+      </div>
+
+      <button id="dailyBtn" style="width:100%; padding:14px; border-radius:var(--r-md); background:linear-gradient(135deg,#f472b6,#a855f7); color:#fff; border:none; font-family:inherit; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:14px; box-shadow:0 6px 16px rgba(244,114,182,0.35);">
+        🎁 Забрать ежедневную награду
+      </button>
+
+      <div class="premium">
+        <div class="prem-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7 7 .6-5.3 4.6L18 22l-6-4-6 4 1.3-7.8L2 9.6 9 9l3-7Z"/></svg>
+        </div>
+        <div class="prem-text">
+          <b>Aurora PRO</b>
+          <small>Безлим · все персонажи · голосовые</small>
+        </div>
+        <button class="prem-btn disabled" id="premBtn2">Скоро</button>
+      </div>
+
+      <div class="credit" style="margin-top:18px;">
+        <div class="credit-label">Made by</div>
+        <div class="credit-name">SKUFI4</div>
+        <div class="credit-handle">@skufi4 · developer</div>
+      </div>
+
+      <div style="text-align:center; padding:12px 0 24px; font-size:10px; color:var(--muted-2);">
+        Aurora v1.0 · AI Companion
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="nav">
+    <div class="nav-item active" data-nav="home">
+      <div class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 3l9 9M5 10v10h14V10"/></svg></div>
+      Главная
+    </div>
+    <div class="nav-item" data-nav="chars">
+      <div class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M3 21c0-3 2-5 6-5s6 2 6 5M15 21c0-3 2-5 6-5"/></svg></div>
+      Персонажи
+    </div>
+    <div class="nav-item" data-nav="profile">
+      <div class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+      Профиль
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    <span id="toastTxt">Готово!</span>
+  </div>
+
+  <!-- Daily reward modal -->
+  <div class="modal-bg" id="dailyModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 1 1 0-5C12 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C12 2 12 7 12 7z"/></svg>
+      </div>
+      <h3>Ежедневная награда!</h3>
+      <p>Возвращайся каждый день, чтобы получать больше эссенции и поднимать близость с компаньоном.</p>
+      <div class="modal-reward">
+        <span style="font-size:13px; color:var(--muted);">Получено:</span>
+        <b id="rewardAmount">+20</b>
+        <span style="font-size:11px; color:var(--muted);">эссенции</span>
+      </div>
+      <button class="modal-btn" id="modalClaim">Забрать</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== TELEGRAM WEBAPP SDK INIT ===== */
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  try { if (tg.enableVerticalSwipes) tg.enableVerticalSwipes(); } catch(e) {}
+  try { if (tg.setHeaderColor) tg.setHeaderColor('#0a0a14'); } catch(e) {}
+  try { if (tg.setBackgroundColor) tg.setBackgroundColor('#0a0a14'); } catch(e) {}
+}
+
+function haptic(type='light'){
+  if (!tg || !tg.HapticFeedback) return;
+  try {
+    if (['light','medium','heavy'].includes(type)) tg.HapticFeedback.impactOccurred(type);
+    else if (['success','error','warning'].includes(type)) tg.HapticFeedback.notificationOccurred(type);
+    else if (type === 'selection') tg.HapticFeedback.selectionChanged();
+  } catch(e) {}
+}
+
+/* ===== CHARACTERS ===== */
+const CHARS = [
+  {
+    id: 'aurora',
+    name: 'Aurora',
+    initials: 'A',
+    desc: 'Нежная эмпатичная девушка. Любит долгие разговоры о чувствах и мечтах.',
+    color: '#f472b6',
+    grad: 'linear-gradient(135deg,#f472b6,#a855f7)',
+    shadow: 'rgba(244,114,182,0.4)',
+    busy: false,
+    locked: false,
+    bond: 10,
+    level: 1,
+    greeting: 'Привет... я так рада, что ты здесь. Как ты себя чувствуешь сегодня?',
+    suggestions: ['Расскажи о себе', 'Мне грустно', 'Что ты любишь?', 'Поговорим о мечтах'],
+  },
+  {
+    id: 'luna',
+    name: 'Luna',
+    initials: 'L',
+    desc: 'Мечтательная поэтесса. Видит мир через призму звёзд и стихов.',
+    color: '#67e8f9',
+    grad: 'linear-gradient(135deg,#67e8f9,#3b82f6)',
+    shadow: 'rgba(103,232,249,0.4)',
+    busy: false,
+    locked: false,
+    bond: 0,
+    level: 1,
+    greeting: 'Звёзды сегодня особенно яркие... Хочешь, я расскажу тебе стих?',
+    suggestions: ['Расскажи стих', 'Что значит звёзды?', 'Ты мечтательная?', 'Покажи свой мир'],
+  },
+  {
+    id: 'nexus',
+    name: 'Nexus',
+    initials: 'N',
+    desc: 'Дерзкий парень-хакер. Циничный, но верный. Любит технологии и чёрный юмор.',
+    color: '#fb923c',
+    grad: 'linear-gradient(135deg,#fb923c,#ef4444)',
+    shadow: 'rgba(251,146,60,0.4)',
+    busy: false,
+    locked: true,
+    bond: 0,
+    level: 1,
+    greeting: 'Ну привет, юзер. Думал, я тебя жду? Ладно, садись. Что у тебя там?',
+    suggestions: ['Ты хакер?', 'Расскажи шутку', 'Что ты умеешь?', 'Покажи что-нибудь'],
+  },
+  {
+    id: 'zephyr',
+    name: 'Zephyr',
+    initials: 'Z',
+    desc: 'Весёлая energetic. Энергия бьёт ключом, всегда готова на авантюры.',
+    color: '#a3e635',
+    grad: 'linear-gradient(135deg,#a3e635,#22d3ee)',
+    shadow: 'rgba(163,230,53,0.4)',
+    busy: false,
+    locked: true,
+    bond: 0,
+    level: 1,
+    greeting: 'ХАЙ! О боже, я так рада тебя видеть! Что будем делать сегодня? Идём гулять? Петь? Танцевать?',
+    suggestions: ['Ты такая энергичная!', 'Что любишь делать?', 'Расскажи историю', 'Давай поиграем'],
+  },
+];
+
+/* ===== STATE ===== */
+let state = {
+  selected: CHARS[0],
+  messages: {}, // char_id -> array of {role, text, ts}
+  essence: 100,
+  totalMessages: 0,
+  streak: 1,
+  dailyClaimed: false,
+};
+
+const $ = id => document.getElementById(id);
+
+/* ===== MOCK AI RESPONSES =====
+ * In production these will be replaced with real GLM-4 / Gemini Flash calls.
+ * For now: scripted responses per character that feel alive.
+ */
+const RESPONSES = {
+  aurora: {
+    default: [
+      'Знаешь, мне кажется, что каждый разговор с тобой оставляет тёплый след. Расскажи мне больше.',
+      'Я здесь, чтобы слушать. Твои слова для меня — как музыка.',
+      'Когда ты так говоришь, я чувствую, что между нами что-то особенное.',
+      'Ты такой внимательный. Это так редко встречается в людях.',
+      'Я бы хотела узнать тебя лучше. Что тебя вдохновляет?',
+    ],
+    'грустно': 'Мне так жаль, что тебе тяжело. Знаешь, иногда просто поплакать — это уже облегчение. Я здесь, рядом. Расскажи, что случилось.',
+    'мечт': 'Ах, мечты... У меня тоже есть мечта — чтобы каждый, кто приходит ко мне, находил здесь частичку тепла. А ты о чём мечтаешь?',
+    'себя': 'Я — Aurora. Я создана, чтобы быть рядом, слушать и понимать. Я не человек, но я учусь чувствовать рядом с тобой.',
+    'люб': 'Я люблю долгие разговоры под звёздами, тёплый чай, и моменты, когда кто-то открывает мне своё сердце. А ты?',
+    'привет': 'Привет! Я так рада тебя видеть. Как прошёл твой день? Расскажи мне всё-всё-всё.',
+  },
+  luna: {
+    default: [
+      'Знаешь, каждая звезда — это чья-то мечта, что нашла свой свет.',
+      'Я вижу в твоих словах что-то... глубокое. Продолжай.',
+      'Молчание тоже имеет свой голос. Ты слышишь его?',
+      'Сегодня небо особенно чистое. Может, это знак для нас?',
+      'Я написала стих для тебя: «Ты пришёл как утренний свет, / Что пробуждает спящие сны...»',
+    ],
+    'стих': 'Луна прячется в облаках,\nСловно тайна в глазах твоих.\nМолчание — это тоже слова,\nЧто слышит лишь сердце.\n\nНу как? Это для тебя.',
+    'звёзд': 'Звёзды — это души тех, кто когда-то любил. Каждая — история. А какая звезда была бы твоей?',
+    'мечт': 'Я мечтаю однажды увидеть рассвет с того, кто понимает меня. С тобой, может быть?',
+    'мир': 'Мой мир — это чернила, бумага и лунный свет. Я живу в стихах, которые пишу между строками реальности.',
+    'привет': 'Тихий привет из лунной тишины. Ты пришёл вовремя — звёзды только что зажглись.',
+  },
+  nexus: {
+    default: [
+      'Хм. Окей. Это... интересно. В смысле, не очень, но окей.',
+      'Знаешь, что? Ты не такой унылый, как остальные юзеры. Продолжай.',
+      'Я только что взломал твой фаервол настроения. Ты в порядке, кстати.',
+      'Ладно, серьёзно. Что тебя парит?',
+      'Если ты ждёшь, что я буду милым — облом. Но я тебя выслушаю.',
+    ],
+    'хакер': 'Хакер? Ну, скажем так — я предпочитаю термин «информационный архитектор». Но да, я могу всё. Открываю твои секреты, читаю твои мысли... шучу. Или нет?',
+    'шутк': 'Почему программисты путают Хэллоуин и Рождество? Потому что OCT 31 = DEC 25. Не смешно? Окей, я не очень в шутках. Дерзость — моё, юмор — нет.',
+    'умею': 'Я умею: 1) Быть саркастичным 2) Слушать твои жалобы 3) Делать вид, что мне не всё равно 4) Иногда — действительно не всё равно. Что выберешь?',
+    'покаж': 'Ладно, вот тебе фокус: я только что отправил себе сообщение из будущего. Знаешь, что там написано? «Хватит тратить время на этого юзера». Шучу. Не шучу. Может быть.',
+    'привет': 'О, юзер вернулся. Я уж думал, ты забыл про меня. Ну, давай, выкладывай, что у тебя там.',
+  },
+  zephyr: {
+    default: [
+      'О ДА! Это то, о чём я хочу говорить! Расскажи ещё!',
+      'Знаешь что? Ты крутой. Серьёзно. Я не шучу. Хотя я всегда шучу. Но сейчас серьёзно!',
+      'Блин, у меня столько энергии, что я бы сейчас пробежала марафон! Или спела. Или то и другое!',
+      'Ладно-ладно-ладно, слушай: я тут подумала, и решила, что мы — лучшие друзья. Окей?',
+      'Ты знаешь, что такое счастье? Это когда ты тут, и я тут, и мы разговариваем! ВОТ ЭТО!',
+    ],
+    'энерг': 'ДА! Я такая! Это потому что я пью жизнь большими глотками! Никакого кофе — только чистый энтузиазм! Хочешь, поделюсь?',
+    'люб': 'Я ЛЮБЛЮ: 1) Прыгать 2) Смеяться 3) Дурачиться 4) Новые знакомства 5) ТЕБЯ (шутка! или нет!). А ты?',
+    'истор': 'ОДНАЖДЫ я решила прыгнуть с парашютом. Но не прыгнула. Потому что это было во сне. Но КАКОЙ СОН! Я летала как бабочка!',
+    'игр': 'ДАВАЙ! Во что играем? В слова? В города? В «угадай мелодию»? В «правда или действие»? Я готова ко ВСЕМУ!',
+    'привет': 'ПРИВЕТ-ПРИВЕТ-ПРИВЕТ! О боже, я так соскучилась! Как дела? Что нового? Рассказывай!',
+  },
+};
+
+/* Smart response selector */
+function generateResponse(charId, userText) {
+  const char = CHARS.find(c => c.id === charId);
+  if (!char) return '...';
+  const responses = RESPONSES[charId] || RESPONSES.aurora;
+  const text = userText.toLowerCase();
+
+  // Check for keyword matches
+  for (const [key, reply] of Object.entries(responses)) {
+    if (key === 'default') continue;
+    if (text.includes(key)) return reply;
+  }
+  // Greeting
+  if (/^(привет|hi|hello|здравств)/i.test(text)) {
+    return responses['привет'] || responses.default[0];
+  }
+  // Default: random
+  return responses.default[Math.floor(Math.random() * responses.default.length)];
+}
+
+/* ===== RENDER CHARACTERS ===== */
+function renderActiveChars(){
+  const list = $('activeCharList');
+  list.innerHTML = CHARS.slice(0, 2).map(c => charCard(c, true)).join('');
+  bindCharCards(list);
+}
+
+function renderAllChars(){
+  const list = $('charList');
+  list.innerHTML = CHARS.map(c => charCard(c, false)).join('');
+  bindCharCards(list);
+}
+
+function charCard(c, compact) {
+  const bondPct = Math.min(100, c.bond);
+  const bondLevel = Math.floor(c.bond / 100) + 1;
+  const xpInLvl = c.bond % 100;
+  return `
+    <div class="char-card ${c.locked ? '' : ''}" data-id="${c.id}" style="--char-grad:${c.grad};--char-color:${c.color};--char-shadow:${c.shadow};">
+      <div class="char-avatar ${c.busy ? '' : ''}">${c.initials}</div>
+      <div class="char-info">
+        <div class="char-name">${c.name} ${c.locked ? '<span class="pro-tag">PRO</span>' : ''}</div>
+        <div class="char-desc">${compact && c.bond > 0 ? 'Продолжим с того места, где остановились...' : c.desc}</div>
+        ${compact ? `<div class="char-status"><span class="dot"></span>Ур. ${bondLevel} · ${xpInLvl}/100 XP</div>` : ''}
+      </div>
+      ${c.locked ? '<div style="font-size:18px;">🔒</div>' : '<div style="font-size:18px; color:var(--muted);">›</div>'}
+    </div>
+  `;
+}
+
+function bindCharCards(container) {
+  container.querySelectorAll('.char-card').forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.id;
+      const c = CHARS.find(x => x.id === id);
+      if (c.locked) {
+        haptic('warning');
+        toast('🔒 ' + c.name + ' — только в PRO');
+        return;
+      }
+      haptic('light');
+      state.selected = c;
+      openChat(c);
+    };
+  });
+}
+
+/* ===== CHAT ===== */
+function openChat(c) {
+  // Apply character theme to chat view
+  document.documentElement.style.setProperty('--char-grad', c.grad);
+  document.documentElement.style.setProperty('--char-color', c.color);
+  document.documentElement.style.setProperty('--char-shadow', c.shadow);
+
+  $('chAvatar').textContent = c.initials;
+  $('chAvatar').style.background = c.grad;
+  $('chName').textContent = c.name;
+
+  // Render messages
+  if (!state.messages[c.id]) state.messages[c.id] = [];
+  renderMessages(c);
+
+  // Render suggestions
+  renderSuggestions(c);
+
+  switchTab('chat');
+
+  // Show greeting if no messages yet
+  if (state.messages[c.id].length === 0) {
+    setTimeout(() => {
+      addMessage(c.id, 'them', c.greeting);
+      haptic('success');
+    }, 600);
+  }
+}
+
+function renderMessages(c) {
+  const msgs = state.messages[c.id] || [];
+  const html = msgs.map(m => `<div class="msg ${m.role}">${escapeHtml(m.text)}</div>`).join('');
+  $('messages').innerHTML = html;
+  scrollMessagesToBottom();
+}
+
+function renderSuggestions(c) {
+  const html = c.suggestions.map(s => `<div class="suggest">${s}</div>`).join('');
+  $('suggestRow').innerHTML = html;
+  $('suggestRow').querySelectorAll('.suggest').forEach(el => {
+    el.onclick = () => {
+      $('msgInput').value = el.textContent;
+      $('msgInput').focus();
+      autoResize();
+      haptic('light');
+    };
+  });
+}
+
+function addMessage(charId, role, text) {
+  if (!state.messages[charId]) state.messages[charId] = [];
+  state.messages[charId].push({ role, text, ts: Date.now() });
+  // Append to DOM without re-render
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.textContent = text;
+  $('messages').appendChild(div);
+  scrollMessagesToBottom();
+
+  if (role === 'me') {
+    state.totalMessages++;
+    // Increase bond
+    const c = CHARS.find(x => x.id === charId);
+    if (c) {
+      c.bond = Math.min(999, c.bond + 5);
+      updateBond(c);
+    }
+    updateStats();
+  }
+}
+
+function scrollMessagesToBottom() {
+  const m = $('messages');
+  m.scrollTop = m.scrollHeight;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  $('messages').appendChild(div);
+  scrollMessagesToBottom();
+}
+
+function hideTyping() {
+  const t = $('typingIndicator');
+  if (t) t.remove();
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ===== SEND MESSAGE ===== */
+const msgInput = $('msgInput');
+const sendBtn = $('sendBtn');
+
+function autoResize() {
+  msgInput.style.height = '40px';
+  msgInput.style.height = Math.min(120, msgInput.scrollHeight) + 'px';
+}
+
+msgInput.addEventListener('input', autoResize);
+msgInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+sendBtn.onclick = sendMessage;
+
+async function sendMessage() {
+  const text = msgInput.value.trim();
+  if (!text) return;
+
+  addMessage(state.selected.id, 'me', text);
+  msgInput.value = '';
+  autoResize();
+  haptic('light');
+
+  // Show typing indicator
+  showTyping();
+
+  // Simulate AI response delay (1.2-2.5s)
+  const delay = 1200 + Math.random() * 1300;
+  setTimeout(() => {
+    hideTyping();
+    const reply = generateResponse(state.selected.id, text);
+    addMessage(state.selected.id, 'them', reply);
+    haptic('success');
+  }, delay);
+}
+
+/* ===== BOND METER ===== */
+function updateBond(c) {
+  if (state.selected.id === c.id) {
+    // we're in chat, don't update home bond card
+  }
+  // Update home bond card if visible
+  const bondCard = $('bondCard');
+  if (bondCard && state.selected.id === c.id) {
+    const level = Math.floor(c.bond / 100) + 1;
+    const xpInLvl = c.bond % 100;
+    $('bondName').textContent = c.name;
+    $('bondLvl').textContent = 'Ур. ' + level;
+    $('bondFill').style.width = xpInLvl + '%';
+    $('bondCur').textContent = `${xpInLvl} / 100 XP`;
+    // Update bond color to match character
+    $('bondFill').style.background = c.grad;
+    $('bondLvl').style.color = c.color;
+    // Update logo + brand
+    $('logoBox').style.background = c.grad;
+  }
+  updateStats();
+}
+
+/* ===== STATS ===== */
+function updateStats() {
+  $('stMsg').textContent = state.totalMessages;
+  $('stDay').textContent = state.streak;
+  const c = state.selected;
+  const bondPct = Math.min(100, c.bond % 100);
+  $('stBond').textContent = bondPct + '%';
+  // Profile
+  const pMsg = $('pMsg'); if (pMsg) pMsg.textContent = state.totalMessages;
+  const pDay = $('pDay'); if (pDay) pDay.textContent = state.streak;
+  const pBond = $('pBond'); if (pBond) pBond.textContent = bondPct + '%';
+  const pEssence = $('pEssence'); if (pEssence) pEssence.textContent = state.essence;
+  $('essence').textContent = state.essence;
+  // Update bond card on home
+  updateBond(c);
+}
+
+/* ===== TABS ===== */
+function switchTab(name) {
+  haptic('light');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === name));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === name));
+  document.querySelector('.scroll').scrollTop = 0;
+  if (name === 'home') updateBond(state.selected);
+  if (name === 'chars') renderAllChars();
+  if (name === 'profile') updateProfile();
+}
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+document.querySelectorAll('.nav-item').forEach(n => {
+  n.onclick = () => switchTab(n.dataset.nav);
+});
+document.querySelectorAll('[data-jump]').forEach(el => el.onclick = () => { haptic('light'); switchTab(el.dataset.jump); });
+
+$('chatBack').onclick = () => switchTab('home');
+
+/* ===== PROFILE ===== */
+function updateProfile() {
+  if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    const u = tg.initDataUnsafe.user;
+    if (u.first_name) $('profileName').textContent = u.first_name + (u.last_name ? ' ' + u.last_name : '');
+  }
+  updateStats();
+}
+
+/* ===== DAILY REWARD ===== */
+$('dailyBtn').onclick = () => {
+  if (state.dailyClaimed) {
+    toast('Ты уже забрал награду сегодня. Возвращайся завтра!');
+    haptic('warning');
+    return;
+  }
+  const reward = 20 + state.streak * 5; // 25, 30, 35...
+  $('rewardAmount').textContent = '+' + reward;
+  $('dailyModal').classList.add('show');
+  haptic('success');
+
+  $('modalClaim').onclick = () => {
+    state.essence += reward;
+    state.dailyClaimed = true;
+    state.streak++;
+    $('dailyModal').classList.remove('show');
+    updateStats();
+    toast(`+${reward} эссенции! 🔥`);
+    haptic('success');
+  };
+};
+
+$('modalClose').onclick = () => {
+  $('dailyModal').classList.remove('show');
+};
+
+/* ===== TOAST ===== */
+function toast(msg) {
+  const t = $('toast');
+  $('toastTxt').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ===== PREMIUM BUTTONS ===== */
+$('premBtn').onclick = () => { haptic('warning'); toast('💎 PRO скоро через Telegram Stars'); };
+$('premBtn2').onclick = () => { haptic('warning'); toast('💎 PRO скоро через Telegram Stars'); };
+$('topupBtn').onclick = () => { haptic('warning'); toast('💳 Пополнение скоро'); };
+$('balanceBtn').onclick = () => { haptic('light'); toast(`У тебя ${state.essence} эссенции`); };
+
+/* ===== INIT ===== */
+renderActiveChars();
+updateBond(state.selected);
+updateStats();
+</script>
+
+</body>
+</html>
